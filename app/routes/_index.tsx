@@ -1,22 +1,17 @@
 import type { MetaFunction } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
-
-// export const loader: LoaderFunction = async () => {
-//   try {
-//     const books = await getAllBooks();
-//     console.log("Books data:", books);
-//   } catch (error) {
-//     return json({ books: [] });
-//   }
-// };
+import { json, Link, useLoaderData } from "@remix-run/react";
 
 export async function loader() {
   const response = await fetch(`http://localhost:3000/api/books`);
 
   try {
-    const books = await response.json();
-    return books.data;
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+    const data = await response.json();
+    return data.data;
   } catch (error) {
+    console.error(error);
     return [];
   }
 }
@@ -38,15 +33,18 @@ export default function Index() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-4 mt-8 bg-white rounded-md ">
-      <h1 className="text-2xl text-center mb-2 ">Books</h1>
-
-      {books.map((book) => (
-        <article key={book.id} className="mb-4">
-          <h2 className="text-lg font-semibold">{book.title}</h2>
-          <p className="text-gray-600">{book.author}</p>
-        </article>
-      ))}
+    <div className="p-4">
+      <h1 className="text-2xl font-bold text-center mb-2 ">Books List</h1>
+      <section className="grid  md:grid-cols-3 gap-4">
+        {books.map((book) => (
+          <Link to={`/books/${book.id}`} key={book.id}>
+            <article className="border p-4 cursor-pointer">
+              <h2 className="text-lg font-semibold">{book.title}</h2>
+              <p>{book.description}</p>
+            </article>
+          </Link>
+        ))}
+      </section>
     </div>
   );
 }
