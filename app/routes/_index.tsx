@@ -1,5 +1,5 @@
 import type { MetaFunction } from "@remix-run/node";
-import { json, Link, useLoaderData } from "@remix-run/react";
+import { data, json, Link, useLoaderData } from "@remix-run/react";
 
 export async function loader() {
   const response = await fetch(`http://localhost:3000/api/books`);
@@ -8,8 +8,14 @@ export async function loader() {
     if (!response.ok) {
       throw new Error(response.statusText);
     }
-    const data = await response.json();
-    return data.data;
+    const data: {
+      id: string;
+      title: string;
+      author: string;
+      description: string;
+    } = await response.json();
+    console.log("Data di SSR -->", data);
+    return json(data);
   } catch (error) {
     console.error(error);
     return [];
@@ -24,11 +30,11 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Index() {
-  const { books } = useLoaderData<typeof loader>();
+  const { data } = useLoaderData<typeof loader>();
 
-  console.log("Books data:", books);
+  console.log("Books data di CSR:", data);
 
-  if (!books || books.length === 0) {
+  if (!data) {
     return <div>No books available</div>;
   }
 
@@ -36,7 +42,7 @@ export default function Index() {
     <div className="p-4">
       <h1 className="text-2xl font-bold text-center mb-2 ">Books List</h1>
       <section className="grid  md:grid-cols-3 gap-4">
-        {books.map((book) => (
+        {data.map((book) => (
           <Link to={`/books/${book.id}`} key={book.id}>
             <article className="border p-4 cursor-pointer">
               <h2 className="text-lg font-semibold">{book.title}</h2>
