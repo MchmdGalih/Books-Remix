@@ -3,30 +3,24 @@ import { useActionData, Form, json, redirect } from "@remix-run/react";
 export const action = async ({ request }: any) => {
   try {
     const formData = await request.formData();
-    const title = formData.get("title");
-    const author = formData.get("author");
-    const description = formData.get("description");
-    const release_date = formData.get("release_date");
-
-    const payload = {
-      title,
-      author,
-      description,
-      release_date: new Date(release_date),
-    };
+    const payload = Object.fromEntries(formData);
 
     const response = await fetch("http://localhost:3000/api/books", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        ...payload,
+        release_date: new Date().toISOString(),
+      }),
     });
-    console.log("success -->", response);
-
+    console.log(response);
     return redirect("/");
   } catch (error) {
-    console.log("error in action:", error);
+    return json({
+      status: false,
+    });
   }
 };
 
