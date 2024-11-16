@@ -15,7 +15,6 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
       author: string;
       description: string;
     } = await response.json();
-    console.log("Data di Loader -->", books);
     return json(books);
   } catch (error) {
     console.error(error);
@@ -26,7 +25,6 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 };
 const Book = () => {
   const { data } = useLoaderData<typeof loader>();
-  console.log("Book di CSR:", data);
   return (
     <section>
       <div className="p-4 max-w-[800px] m-auto">

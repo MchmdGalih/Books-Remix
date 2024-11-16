@@ -1,4 +1,4 @@
-import { useActionData, Form, json, redirect } from "@remix-run/react";
+import { Form, json, redirect, useNavigation } from "@remix-run/react";
 
 export const action = async ({ request }: any) => {
   try {
@@ -25,8 +25,9 @@ export const action = async ({ request }: any) => {
 };
 
 const FormBook = () => {
-  const actionData = useActionData();
-  console.log("Action Data", actionData);
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
+
   return (
     <div className="p-4 max-w-[800px] m-auto mt-5">
       <h1 className="text-center">Form Book</h1>
@@ -67,9 +68,12 @@ const FormBook = () => {
 
         <button
           type="submit"
-          className="bg-blue-300 p-2 rounded-md text-white font-medium"
+          className={`bg-blue-500 p-2 rounded-md text-white font-medium ${
+            isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          disabled={isSubmitting}
         >
-          Submit
+          {isSubmitting ? "Submitting..." : "Submit"}
         </button>
       </Form>
     </div>
