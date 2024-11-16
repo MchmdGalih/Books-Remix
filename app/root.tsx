@@ -34,9 +34,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <header className="p-4 bg-blue-500">
-          <nav className="flex gap-4 text-white">
-            <Link to="/">Home</Link>
-            <Link to="/form">Form</Link>
+          <nav className="flex justify-between items-center text-white">
+            <div className="text-2xl font-bold ">
+              <Link to="/">Book Remix</Link>
+            </div>
+
+            <div className="flex gap-4">
+              <Link to="/">Home</Link>
+              <Link to="/form">Form</Link>
+            </div>
           </nav>
         </header>
         <main>{children}</main>

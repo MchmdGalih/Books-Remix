@@ -15,7 +15,11 @@ export const action = async ({ request }: any) => {
         release_date: new Date().toISOString(),
       }),
     });
-    console.log(response);
+
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+
     return redirect("/");
   } catch (error) {
     return json({

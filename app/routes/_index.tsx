@@ -1,7 +1,8 @@
 import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
-import { Form, json, Link, redirect, useLoaderData } from "@remix-run/react";
-import { error } from "node:console";
-import { showFormattedDate } from "~/utils/formatDate";
+import { json, useLoaderData } from "@remix-run/react";
+import Card from "~/components/Card";
+import HeroSection from "~/components/HeroSection";
+import { Book } from "~/types/books";
 
 export const meta: MetaFunction = () => {
   return [
@@ -16,14 +17,9 @@ export async function loader() {
     if (!response.ok) {
       throw new Error(response.statusText);
     }
-    const data: {
-      id: string;
-      title: string;
-      author: string;
-      description: string;
-    } = await response.json();
+    const book: Book[] = await response.json();
 
-    return json(data);
+    return json(book);
   } catch (error) {
     console.error(error);
     return [];
@@ -34,43 +30,33 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const id = formData.get("id");
 
-  console.log("-->", id);
   const response = await fetch(`http://localhost:3000/api/books/${id}`, {
     method: "DELETE",
   });
+
+  if (!response.ok) {
+    throw new Error(response.statusText);
+  }
 
   return null;
 }
 
 export default function Index() {
   const { data } = useLoaderData<typeof loader>();
+  console.log;
 
   if (!data) {
     return <div>No books available</div>;
   }
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold text-center mb-2 ">Books List</h1>
-      <section className="grid  md:grid-cols-3 gap-4">
-        {data.map((book) => (
-          <article key={book.id} className="border p-4 cursor-pointer">
-            <Link to={`/books/${book.id}`}>
-              <h2 className="text-lg font-semibold">{book.title}</h2>
-              <p>{showFormattedDate(book.release_date)}</p>
-              <p>{book.author}</p>
-              <p>{book.description}</p>
-            </Link>
-            <Form method="post">
-              <input type="hidden" name="id" value={book.id} />
-              <button
-                type="submit"
-                className="p-2 bg-red-500 mt-2 rounded-md text-white"
-              >
-                Delete
-              </button>
-            </Form>
-          </article>
+    <div>
+      <HeroSection />
+
+      <h1 className="text-3xl font-bold text-center mb-4 mt-4 ">Books List</h1>
+      <section className="grid p-4  md:grid-cols-3 gap-4" id="book-list">
+        {data.map((book: Book) => (
+          <Card key={book.id} book={book} />
         ))}
       </section>
     </div>
